@@ -1,0 +1,51 @@
+# tdkLambda.proto
+# Proto file for the TDK Lambda PowerSupply
+# Mehmet Bozdogan 30/11/2017
+#
+################################################################################
+Terminator = CR LF;
+ReadTimeout = 100;
+WriteTimeout = 100;
+PollPeriod = 100;
+ReplyTimeout = 1000;
+LockTimeout = 5000;
+ExtraInput = Ignore;
+getStatus {
+	out "OUTP:STAT?";
+	in "%{0|1}";
+}
+switch {
+	out "OUTP:STAT %{0|1}";
+	@init { getStatus; }
+}
+getVoltage {
+	out "MEAS:VOLT?";
+	in "%f";
+}
+setVoltage {
+	out "VOLT %f";
+	@init { getVoltage; }
+}
+getCurrent {
+	out "MEAS:CURR?";
+	in "%f";
+}
+setCurrent {
+	out "CURR %f";
+	@init { getCurrent; }
+}
+getIdentity {
+	out "*IDN?";
+	in "%s";
+}
+clearErrors {
+	out "*CLS";
+}
+getErrors {
+	out "SYST:ERR?";
+	in "%39c";
+}
+selfTest {
+	out "*TST?";
+	in "%{0|1}";
+}

@@ -1,0 +1,16 @@
+# template.substitutions
+# Template file for Tarla Devices
+# Mehmet Bozdogan 04/11/2017
+#
+# substitutions:
+# sys    - system
+# sec    - section
+# dev    - device
+# $(sys)-$(sec)-$(dev) - device port(devPort)
+#
+#
+################################################################################
+file db/tdklambda.template {
+    pattern 	{ sys	sec	dev	drvhV	drvlV	drvhC	drvlC	}
+        	{ SYS	SEC	DEV	20	0	10	0	}
+}

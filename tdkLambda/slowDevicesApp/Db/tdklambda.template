@@ -1,0 +1,110 @@
+# tdkLambda.template
+# Template database for the TDK Lambda PowerSupply
+# Mehmet Bozdogan 30/11/2017
+#
+# substitutions:
+# sys    - system
+# sec    - section
+# dev    - device
+# $(sys)-$(sec)-$(dev) - device port
+#
+#
+################################################################################
+record(stringin,"$(sys)-$(sec)-$(dev):IDN") {
+	field(DESC,"$(dev) identification")
+	field(DTYP,"stream")
+	field(INP,"@tdklambda.proto getIdentity $(sys)-$(sec)-$(dev)")
+	field(PINI,"YES")
+}
+record(bi, "$(sys)-$(sec)-$(dev):STATUS") {
+	field(DESC,"$(dev) status info")
+	field(DTYP,"stream")
+	field(INP,"@tdklambda.proto getStatus $(sys)-$(sec)-$(dev)")
+	field(SCAN,"1 second")
+	field(ZNAM,"OFF")
+	field(ONAM,"ON")
+}
+record(bo, "$(sys)-$(sec)-$(dev):SWITCH") {
+	field(DESC,"$(dev) switch off/on")
+	field(DTYP,"stream")
+	field(OUT,"@tdklambda.proto switch $(sys)-$(sec)-$(dev)")
+	field(SCAN,"Passive")
+	field(ZNAM,"OFF")
+	field(ONAM,"ON")
+}
+record(ai, "$(sys)-$(sec)-$(dev):VOLTAGE-RB") {
+	field(DESC,"$(dev) voltage readback")
+	field(DTYP,"stream")
+	field(INP,"@tdklambda.proto getVoltage $(sys)-$(sec)-$(dev)")
+	field(EGU,"V")
+	field(SCAN,"1 second")
+	field (PREC, "2")
+	field(HOPR,"$(drvhV)")
+	field(LOPR,"$(drvlV)")
+	field(FLNK, "$(sys)-$(sec)-$(dev):POWER-RB")
+}
+record(ao, "$(sys)-$(sec)-$(dev):VOLTAGE-SP") {
+	field(DESC,"$(dev) voltage setpoint")
+	field(DTYP,"stream")
+	field(OUT,"@tdklambda.proto setVoltage $(sys)-$(sec)-$(dev)")
+	field(EGU,"V")
+	field (PREC, "2")
+	field(DRVH,"$(drvhV)")
+	field(DRVL,"$(drvlV)")
+	field(HOPR,"$(drvhV)")
+	field(LOPR,"$(drvlV)")
+
+}
+record(ai, "$(sys)-$(sec)-$(dev):CURRENT-RB") {
+	field(DESC,"$(dev) current readback")
+	field(DTYP,"stream")
+	field(INP,"@tdklambda.proto getCurrent $(sys)-$(sec)-$(dev)")
+	field(EGU,"A")
+	field(SCAN,"1 second")
+	field (PREC, "2")
+	field(HOPR,"$(drvhC)")
+	field(LOPR,"$(drvlC)")
+	field(FLNK, "$(sys)-$(sec)-$(dev):POWER-RB")
+}
+record(ao, "$(sys)-$(sec)-$(dev):CURRENT-SP") {
+	field(DESC,"$(dev) current setpoint")
+	field(DTYP,"stream")
+	field(OUT,"@tdklambda.proto setCurrent $(sys)-$(sec)-$(dev)")
+	field(EGU,"A")
+	field (PREC, "2")
+	field(DRVH,"$(drvhC)")
+	field(DRVL,"$(drvlC)")
+	field(HOPR,"$(drvhC)")
+	field(LOPR,"$(drvlC)")
+}
+record (calc, "$(sys)-$(sec)-$(dev):POWER-RB") {
+	field(DESC,"$(dev) power readback")
+	field(INPA, "$(sys)-$(sec)-$(dev):CURRENT-RB")
+	field(INPB, "$(sys)-$(sec)-$(dev):VOLTAGE-RB")
+	field(CALC, "A*B")
+	field(SCAN, "Passive")
+	field(EGU , "Watt")
+	field(PREC, "2")
+}
+record(stringin,"$(sys)-$(sec)-$(dev):ERR") {
+	field(DESC,"$(dev) error check")
+	field(DTYP,"stream")
+	field(INP,"@tdklambda.proto getErrors $(sys)-$(sec)-$(dev)")
+	field(SCAN,"Passive")
+	field(PINI,"YES")
+}
+record(bi, "$(sys)-$(sec)-$(dev):SELFTEST") {
+	field(DESC,"$(dev) self test")
+	field(DTYP,"stream")
+	field(INP,"@tdklambda.proto selfTest $(sys)-$(sec)-$(dev)")
+	field(SCAN,"Passive")
+	field(ZNAM,"ERROR")
+	field(ONAM,"OK")
+	field(PINI,"YES")
+}
+record(bo, "$(sys)-$(sec)-$(dev):CERR") {
+	field(DESC,"$(dev) error clear")
+	field(DTYP,"stream")
+	field(OUT,"@tdklambda.proto clearErrors $(sys)-$(sec)-$(dev)")
+	field(SCAN,"Passive")
+}
